@@ -1,0 +1,6 @@
+# Pastas e arquivos que não devem ir para o GitHub
+
+node_modules
+.env
+.wwebjs_auth
+*.session.json
