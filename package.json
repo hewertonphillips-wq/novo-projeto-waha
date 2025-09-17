@@ -6,12 +6,16 @@
   "scripts": {
     "start": "node server.js"
   },
+  "engines": {
+    "node": "22.x"
+  },
   "dependencies": {
+    "express": "^4.19.2",
     "moment-timezone": "^0.5.45",
     "openai": "^4.78.1",
+    "puppeteer-core": "^24.21.0",
+    "qrcode": "^1.5.3",
     "qrcode-terminal": "^0.12.0",
-    "whatsapp-web.js": "1.33.2",
-    "express": "^4.19.2",
-    "qrcode": "^1.5.3"
+    "whatsapp-web.js": "^1.34.1"
   }
 }
