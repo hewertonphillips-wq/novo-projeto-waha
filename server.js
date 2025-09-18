@@ -1,18 +1,22 @@
-/// server.js
+// server.js
 const express = require('express');
 const path = require('path');
+const fs = require('fs');
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 const QRCode = require('qrcode');
 
 const app = express();
-const PORT = process.env.PORT || 8080; // Railway força porta 8080
+const PORT = process.env.PORT || 8080; // Railway exige porta 8080
 
 // Caminho da sessão (Railway ou local)
 const volumeBase = process.env.RAILWAY_VOLUME_MOUNT_PATH || null;
 const sessionDir = volumeBase 
     ? path.join(volumeBase, 'wwebjs_auth') 
     : path.join(__dirname, '.wwebjs_auth');
+
+// Garante que o diretório da sessão exista
+if (!fs.existsSync(sessionDir)) fs.mkdirSync(sessionDir, { recursive: true });
 
 console.log('Session path:', sessionDir);
 
@@ -43,12 +47,12 @@ client.on('qr', async (qr) => {
     console.log('QR gerado — acesse /qr para escanear ou veja os logs.');
 });
 
-// Evento pronto
+// Cliente pronto
 client.on('ready', () => {
-    console.log('WhatsApp client pronto ✅');
+    console.log('WhatsApp client pronto ✅ Sessão persistida automaticamente.');
 });
 
-// Evento autenticado
+// Cliente autenticado
 client.on('authenticated', () => {
     console.log('Autenticado com sucesso ✅');
 });
@@ -63,7 +67,7 @@ client.on('disconnected', (reason) => {
     console.log('Desconectado:', reason);
 });
 
-// Resposta simples por palavra-chave
+// Resposta automática
 client.on('message', msg => {
     const text = (msg.body || '').toLowerCase();
     if (text.includes('teste')) {
@@ -72,7 +76,9 @@ client.on('message', msg => {
 });
 
 // Inicializa cliente
-client.initialize();
+client.initialize().catch(err => {
+    console.error('Erro ao inicializar o cliente WhatsApp:', err);
+});
 
 // Servidor web para manter o bot vivo e exibir QR
 app.get('/', (req, res) => res.send('Bot do WhatsApp rodando 24/7 no Railway.'));
@@ -87,3 +93,4 @@ app.get('/qr', (req, res) => {
 });
 
 app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
+
